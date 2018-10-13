@@ -32,26 +32,21 @@
                     Hot news
                 </label>
             </div>
-            <div class="b-content-hotnews">
-                    </div>
-
-        <!--    <div class="b-title-bar-right">-->
-        <!--        <label>-->
-        <!--            <i class="fa fa-envelope-o" aria-hidden="true"></i>-->
-        <!--            NewsLetter-->
-        <!--        </label>-->
-        <!--    </div>-->
-        <!--    <div class="b-content-email">-->
-        <!--        <img src="--><!--images/email.jpg" title="email" alt="email"/>-->
-        <!--        <p>Get the recent popular stories straight into your inbox</p>-->
-        <!--        <form method="post" action="--><!--register-email">-->
-        <!--            <div class="form-group">-->
-        <!--                <input type="email" name="email" class="form-control form-control-lg" placeholder="Enter email" required />-->
-        <!--            </div>-->
-        <!--            <button type="submit" class="btn btn-primary btn-lg col-lg-12 col-md-12 col-sm-12 regisemail">Subscribe-->
-        <!--            </button>-->
-        <!--        </form>-->
-        <!--    </div>-->
+            <div class="b-content-hotnews" v-if="topNew.length > 0">
+                <ul v-for="data,index in topNew">
+                    <li>
+                        <div class="stt-news">{{ index+1 }}</div>
+                    </li>
+                    <li>
+                        <h4>
+                            <a :href="APP_URL + '/post/' + data.link ">{{ data.name }}</a>
+                        </h4>
+                        <div class="author-time">
+                            <span><i class="fa fa-clock-o" aria-hidden="true"></i> {{ data.publish_at | moment("dddd, DD-MM-YYYY HH:mm") }}</span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
 
             <!--    Ads right 2-->
         <div class="text-center" style="padding: 0 0 15px 0;">
@@ -69,7 +64,23 @@
 </template>
 
 <script>
+import config from '../config.js'
+import iaxios from 'axios'
+import Vue from 'vue'
+Vue.use(require('vue-moment'));
+
+var axios = iaxios.create({baseURL: config.API_URL});
 export default {
-    props: ['coinData']
+    props: ['coinData'],
+    data: function () {
+        return {
+            APP_URL: config.APP_URL,
+            topNew: []
+        }
+    },
+    mounted: async function () {
+        let res = await axios.get('/getTopNew');
+        this.topNew = res.data.data;
+    }
 }
 </script>

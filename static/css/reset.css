@@ -11,7 +11,7 @@
     font-family: "OpenSans-Semibold";
     src: url('font/Opensans/OpenSans-Semibold.ttf') format('truetype');
 }*/
-body{font-size:14px;color:#111;background: #f7f7f7;/*font-family: "OpenSans-Regular";*/font-family:ProximaNova,"Helvetica Neue",Helvetica,Arial,sans-serif;}
+body{font-size:14px; color:#111; background: #fff; /*font-family: "OpenSans-Regular";*/font-family:ProximaNova,"Helvetica Neue",Helvetica,Arial,sans-serif;}
 h1{font-size:23px}
 h2{font-size:16px}
 h3{font-size:14px}

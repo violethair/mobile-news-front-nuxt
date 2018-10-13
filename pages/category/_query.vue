@@ -1,50 +1,80 @@
 <template>
 	<div>
-		<iheader :categories="categories"/>
+		<imenu :categories="categories"/>
+		<iheader :pressReleases="pressReleases"/>
 		<section v-if="info">
 		    <div class="wrap-content-page">
-		        <div class="b-title-category">
-		            <div class="main-width">
-		                <h1 class="font-bold">{{info.name}}</h1>
-		            </div>
-		        </div>
-		        <div class="main-width">
-		            <div class="wrap-content-two-box">
-		                <div class="content-two-box-left">
-		                    <div class="wrap-list-data-one">
-		                        <ul id="return_ajax_product">
-		                            <li v-for="data in info.post">
-		                                <div class="wrap-content-data-one">
-		                                    <div class="w-img-two img-outer">
-		                                        <a :href="'/post/' + data.link" :title="data.name">
-		                                        	<div style="width: 250px;height: 166px;overflow: hidden;float: left;">
-		                                        		<img class="image" :src="API_URL + '/postThumb/' + data.images" :title="data.name" :alt="data.name">
-		                                        	</div>
-		                                        </a>
-		                                    </div>
-		                                    <div class="author-time">
-		                                        <span><i class="fa fa-clock-o" aria-hidden="true"></i> {{ data.publish_at | moment("dddd, DD-MM-YYYY HH:mm") }}</span>
-		                                    </div>
-		                                    <h3>
-		                                        <a :href="'/post/' + data.link" :title="data.name">{{data.name}}</a>
-		                                    </h3>
-		                                    <div class="shortdes" style="height: 80px;overflow: hidden;">{{ data.shortdes }}</div>
-		                                </div>
-		                            </li>
-		                        </ul>
-		                    </div>
-		                    <div id="loadmore-category" class="cusor-load">
-		                        <button class="b-loadmore" @click="loadMore">
-		                        View more
-		                        </button>
-		                        <div class="load-more">
-		                            <img src="/images/load-more.png" title="Load more" alt="Load more">
+		        <div class="wrap-parent-catrgory">
+				    <ul>
+				        <li class="parent">
+				            <a href="/" title="Home">
+				                Home
+				            </a>
+				        </li>
+				        <li v-if="info.parent" class="ic">
+				            <i class="fa fa-angle-right" aria-hidden="true"></i>
+				        </li>
+			            <li v-if="info.parent" class="parent">
+			                <a :href="'/category/' + info.parent.link"
+			                   :title="info.parent.name">
+			                    {{ info.parent.name }}
+			                </a>
+			            </li>
+			            <li class="ic">
+				            <i class="fa fa-angle-right" aria-hidden="true"></i>
+				        </li>
+			            <li class="parent">
+			                <h1>
+			                    <a :href="'/category/' + info.link"
+			                       :title="info.name">
+			                        {{ info.name }}
+			                    </a>
+			                </h1>
+			            </li>
+				    </ul>
+				</div>
+				<div class="wrap-list-data-category">
+			        <ul class="data-tab-one">
+		                <li v-for="data in info.post">
+		                    <div class="content-data">
+		                        <div class="w-img-two img-outer">
+		                            <a :href="'/post/' + data.link"
+		                               :title="data.name">
+		                                <img
+		                                	style="width: 415px;" 
+		                                	class="image"
+		                                    :src="IMAGE_URL + data.images"
+		                                    :title="data.name"
+		                                    :alt="data.name">
+		                            </a>
+		                        </div>
+		                        <div class="info-news" style="padding: 0px;margin-bottom: 10px">
+		                            <h3 style="margin: 0px;">
+		                                <a :href="'/post/' + data.link"
+		                                   :title="data.name">
+		                                   {{ data.name }}
+		                                </a>
+		                            </h3>
+		                            <div class="author-time">
+		                                <span>
+		                                    <i class="fa fa-clock-o" aria-hidden="true"></i>
+		                                    {{ data.publish_at | moment("dddd, DD-MM-YYYY HH:mm") }}
+		                                </span>
+		                            </div>
 		                        </div>
 		                    </div>
-		                </div>
-		                <isidebar :coinData="coinData" />
-		            </div>
-		        </div>
+		                </li>
+			        </ul>
+				</div>
+
+				<div id="viewMoreCategory" class="load-more">
+				    <i class="fa fa-undo" aria-hidden="true"></i>
+				    Load more
+				</div>
+				<div id="notify" class="d-notify" style="margin-bottom: 0px;"></div>
+				<input type="hidden" id="page_load" value="2"/>
+				<input type="hidden" id="category_id" value="<?php echo !empty($data_cate['id']) ? $data_cate['id'] : ''; ?>"/>
+
 		    </div>
 		</section>
 		<ifooter :categories="categories" :setting="setting" />
@@ -52,6 +82,7 @@
 </template>
 
 <script>
+import imenu from '@/components/menu'
 import iheader from '@/components/header'
 import ifooter from '@/components/footer'
 import isidebar from '@/components/sidebar'
@@ -62,6 +93,7 @@ var axios = iaxios.create({baseURL: config.API_URL});
 
 export default {
     components : {
+    	imenu,
         iheader,
         ifooter,
         isidebar
@@ -78,13 +110,14 @@ export default {
     	let res = await axios.get('/getCategoryInfo/' + params.query); 
         let categoryRes = await axios.get('/getCategory')
         let settingRes = await axios.get('/getSetting')
-        let coinDataRes = await axios.get('https://api.coinmarketcap.com/v2/ticker/?limit=5')
+        let pressReleases = await axios.get('/getPressReleases');
         return {
             API_URL : config.API_URL,
+            IMAGE_URL : config.IMAGE_URL,
             info: res.data.data,
             categories: categoryRes.data.data,
             setting: settingRes.data.data,
-            coinData: coinDataRes.data.data,
+            pressReleases: pressReleases.data.data
         }
     },
     methods: {
